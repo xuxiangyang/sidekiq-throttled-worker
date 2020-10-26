@@ -5,7 +5,7 @@ module Sidekiq
         def limit?(worker_class, jid)
           # only allow one worker check limit
           concurrency = worker_class.get_sidekiq_options["concurrency"]
-          ttl = (worker_class.get_sidekiq_options["concurrency_ttl"] || 900) # assume worker should finish run in 15 minutes, and worker can not run completely max for 15 minutes in extreme case
+          ttl = (worker_class.get_sidekiq_options["concurrency_ttl"] || 900) # assume worker should finish run in 15 minutes, and worker may be block completely max for 15 minutes in extreme case
           check_limit_key = "sidekiq:throttled_worker:check_limit:#{worker_class}"
           now = Time.now.to_f
           Sidekiq.redis do |conn|

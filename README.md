@@ -1,8 +1,6 @@
 # Sidekiq::Throttled::Worker
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/sidekiq/throttled/worker`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Sidekiq concurrency limit per worker in whole cluster,  inspired by [sidekiq-throttled](https://github.com/sensortower/sidekiq-throttled). This gem only support concurrency, and try to avoid use lua in redis to reduce redis CPU usage.
 
 ## Installation
 
@@ -22,7 +20,32 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+After Sidekiq `configure_server`，you should add next line in sidekiq initializer
+
+```ruby
+Sidekiq::ThrottledWorker.setup!
+```
+
+
+This gem add two options attr in `sidekiq_options` func：
+
+* `concurrency` : limit concurrency with current worker in whole cluster. Default is  `nil` , which mean on limit 
+* `concurrency_ttl` : max worker run time, and worker may be block completely max for `concurrency_ttl` in  extreme case. Default is 900, in most cases, you do not need change this.
+
+Here is an example worker
+
+```ruby
+class TestWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :default, concurrency: 2
+
+  def perform
+  end
+end
+
+```
+
+
 
 ## Development
 
