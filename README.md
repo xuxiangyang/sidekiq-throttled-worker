@@ -2,6 +2,8 @@
 
 Sidekiq concurrency limit per worker in whole cluster,  inspired by [sidekiq-throttled](https://github.com/sensortower/sidekiq-throttled). This gem only support concurrency, and try to avoid use lua in redis to reduce redis CPU usage.
 
+This gem was designed to limit concurrency for some sensitive resources, e.g., databases and http requests, without concurrency limit, sidekiq may crush this services. When some worker exceed concurrency limit, this gem may try to slow down sidekiq process. Concurrency limit should only be use to in extreme case, you should not use this gem to limit business logic
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -29,7 +31,7 @@ Sidekiq::ThrottledWorker.setup!
 
 This gem add two options attr in `sidekiq_options` func：
 
-* `concurrency` : limit concurrency with current worker in whole cluster. Default is  `nil` , which mean on limit 
+* `concurrency` : limit concurrency with current worker in whole cluster. Default is  `nil` , which mean on limit
 * `concurrency_ttl` : max worker run time, and worker may be block completely max for `concurrency_ttl` in  extreme case. Default is 900, in most cases, you do not need change this.
 
 Here is an example worker

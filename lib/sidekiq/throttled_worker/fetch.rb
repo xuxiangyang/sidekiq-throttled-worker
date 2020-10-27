@@ -12,8 +12,12 @@ module Sidekiq
         return work if worker_class.get_sidekiq_options["concurrency"].nil?
 
         if Concurrency.limit?(worker_class, job_hash['jid'])
-          sleep(rand * 0.1) # wait 100ms to reduce redis qps
-          work.requeue
+          job_hash["concurrency_limit_count"] ||= 0
+          job_hash["concurrency_limit_count"] += 1
+          sleep(rand * [(job_hash["concurrency_limit_count"] - 1) * 0.01, 0.1].min)
+          Sidekiq.redis do |conn|
+            conn.lpush("queue:#{work.queue_name}", Sidekiq.dump_json(job_hash)) # put in queue end to auto wait some time in busy sidekiq cluster
+          end
           nil
         else
           work
