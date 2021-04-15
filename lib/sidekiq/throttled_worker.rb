@@ -16,6 +16,18 @@ module Sidekiq
           end
         end
       end
+
+      def redis=(hash)
+        @redis = if hash.is_a?(ConnectionPool)
+                   hash
+                 else
+                   Sidekiq::RedisConnection.create(hash)
+                 end
+      end
+
+      def redis
+        @redis ||= Sidekiq::RedisConnection.create
+      end
     end
   end
 end
