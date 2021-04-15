@@ -26,7 +26,7 @@ module Sidekiq
       end
 
       def redis
-        @redis ||= Sidekiq::RedisConnection.create
+        @redis ||= Sidekiq.redis_pool
       end
     end
   end
